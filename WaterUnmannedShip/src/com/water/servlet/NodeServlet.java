@@ -26,15 +26,15 @@ public class NodeServlet extends HttpServlet {
 	
 	public void init() throws ServletException {
 		
-		System.out.println("NodeServlet·şÎñÆô¶¯¿ªÊ¼");
-		System.out.println("×¼±¸¼àÌıµØÃæÕ¾·¢À´µÄĞÅÏ¢");
+		System.out.println("NodeServletæœåŠ¡å¯åŠ¨");
+		System.out.println("å‡†å¤‡ç›‘å¬åœ°é¢ç«™æ¥æ”¶åˆ°çš„ä¿¡æ¯");
 	
 		try {
 			
 			ServerSocket serverSocket = new ServerSocket();
 			//172.19.251.119
 		   	serverSocket.bind(new InetSocketAddress("172.19.251.119",8086));
-		   	System.out.println("socketÅäÖÃÍê±Ï£¬×¼±¸¼àÌıÁË¡£¡£¡£¡£¡£");
+		   	System.out.println("socketé…ç½®å®Œæ¯•å‡†å¤‡ç›‘å¬");
 			new SocketThread(serverSocket).start();
 			
 		} catch (IOException e) {
@@ -88,17 +88,17 @@ class MyThread implements Runnable{
 		
 			try {
 				InputStream inputStream = socket.getInputStream();
-				//°ÑÊä³öÁ÷´òÓ¡³öÀ´
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½
 				byte[] buf = new byte[1024];
 				int length = 0;
-				System.out.println("×¼±¸¸É»îÁË¡£¡£¡£¡£");
+				System.out.println("å‡†å¤‡å¹²æ´»äº†");
 				Position position = new Position();
 				while((length = inputStream.read(buf))!=-1)
 				{
 					
 					String dataTmp = new String(buf,0,length);
 					dataTmp = dataTmp.trim();
-					System.out.println("½ÓÊÕµ½µÄÊı¾İÎª£º"+ new String(buf,0,length));
+					System.out.println("æ¥æ”¶åˆ°çš„æ•°æ®ä¸ºï¼š"+ new String(buf,0,length));
 					if(!"www.usr.cn".equals(dataTmp))
 					{
 //						float data = Float.parseFloat(dataTmp);
@@ -109,14 +109,14 @@ class MyThread implements Runnable{
 						
 					}else{
 						
-						//System.out.println("½ÓÊÕµ½µÄÊı¾İÎª£º"+ new String(buf,0,length));
+						//System.out.println("ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½"+ new String(buf,0,length));
 						
 					}
 					//OutputStream outputStream = socket.getOutputStream();
 					//outputStream.write("Hello".getBytes());
 				}
 				System.out.println(length);
-				System.out.println("½ÓÊÜÍê±Ï£¬×¼±¸¹Ø±Õsocket");
+				System.out.println("æ¥æ”¶å®Œæ¯•ï¼Œå‡†å¤‡å…³é—­socket");
 				socket.close() ;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -141,7 +141,6 @@ class StoreData implements Runnable{
 			position.setPosition(random);
 			position.setState(true);
 			positionDao.savePosition(position);
-			//System.out.println("´æÈ¡Êı¾İ³É¹¦");
 			try {
 				Thread.sleep(1000*5);
 			} catch (InterruptedException e) {

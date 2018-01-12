@@ -14,7 +14,7 @@ import com.water.service.impl.ShipDataService;
 public class TestShip {
 	
 	/**
-	 * c测试数据读取连接是否正常
+	 * 娴嬭瘯鏁版嵁杩炴帴鏄惁姝ｅ父
 	 * 
 	 */
 	IShipDataService dataService = new ShipDataService();

@@ -43,7 +43,6 @@ public class PositionDao implements IPositionDao {
 		
 		}
 	}
-	//ÐÞ¸Ä
 
 	@Override
 	public void setPositionState(Boolean state,int id) {

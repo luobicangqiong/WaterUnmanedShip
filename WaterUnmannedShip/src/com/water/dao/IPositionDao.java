@@ -8,16 +8,20 @@ import com.water.entity.Position;
 public interface IPositionDao {
 
 	/**
-	 * 保存当前位置信息到数据库
+	 * 淇濆瓨褰撳墠浣嶇疆淇℃伅
 	 * @param p
 	 */
 	public void savePosition(Position p);
 	/**
-	 * 得到当前位置信息
+	 * 寰楀埌褰撳墠鎵�鏈夌殑浣嶇疆淇℃伅
 	 * @return
 	 */
 	public List<Position> getPosition(Boolean state);
-	
+    /**
+     * 璁剧疆浣嶇疆淇℃伅
+     * @param state
+     * @param id
+     */
 	public void setPositionState(Boolean state,int id);
 	
 }
