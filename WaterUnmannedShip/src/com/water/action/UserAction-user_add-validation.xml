@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE validators PUBLIC
+ 		"-//Apache Struts//XWork Validator 1.0.3//EN"
+ 		"http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+	<!-- 验证的每一个字段用field表示 -->
+	<field name="shipData.speedShip">
+		<!-- 指定使用的验证器 -->
+		<field-validator type="double">
+			<!-- 验证失败的错误提示信息 -->
+			<message>类型必须为整数</message>
+		</field-validator>
+	</field>
+	
+	<field name="shipData.speedWater">
+		<field-validator type="double">
+			<message>类型必须为整数</message>
+		</field-validator>
+	</field>
+	
+	<field name="shipData.scoreWater">
+		<field-validator type="int">
+			<message>类型必须是整数</message>
+		</field-validator>
+	</field>
+</validators>
