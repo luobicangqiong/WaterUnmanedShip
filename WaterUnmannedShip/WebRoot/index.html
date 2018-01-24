@@ -33,7 +33,7 @@
       }
        
       
-      websocket.onmessage = function(){
+      websocket.onmessage = function(event){
           setMessageInnerHTML(event.data);
       }
        

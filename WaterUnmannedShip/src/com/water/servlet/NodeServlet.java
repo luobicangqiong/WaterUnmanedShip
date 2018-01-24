@@ -10,11 +10,22 @@ import java.net.Socket;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Parser;
+import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
 import com.sun.beans.editors.FloatEditor;
+import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
 import com.water.entity.Position;
-
+/**
+ * 通信协议接收
+ * 1. 
+ * @author luobicangqiong
+ *
+ */
 public class NodeServlet extends HttpServlet {
 
 
@@ -32,7 +43,7 @@ public class NodeServlet extends HttpServlet {
 		try {
 			
 			ServerSocket serverSocket = new ServerSocket();
-			//172.19.251.119
+			//172.19.251.119注意此时监听的IP不是公网的IP而是内网的IP
 		   	serverSocket.bind(new InetSocketAddress("172.19.251.119",8086));
 		   	System.out.println("socket配置完毕准备监听");
 			new SocketThread(serverSocket).start();
@@ -42,8 +53,6 @@ public class NodeServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-//		StoreData st = new StoreData();
-//		new Thread(st).start();
 	}
 
 }
@@ -53,7 +62,7 @@ class SocketThread extends Thread{
 	ServerSocket serverSocket;
 	
 	public SocketThread(ServerSocket s) {
-		// TODO Auto-generated constructor stub
+
 		this.serverSocket = s;
 	}
 	@Override
@@ -76,7 +85,9 @@ class SocketThread extends Thread{
 
 class MyThread implements Runnable{
 	
+	Parser parser = new Parser();    //解析通信包
 	IPositionDao positionDao = new PositionDao();
+	IGps_position gpsdao = new Gps_positionDao();
 	Socket socket;
 	public MyThread(Socket s) {
 		// TODO Auto-generated constructor stub
@@ -87,39 +98,47 @@ class MyThread implements Runnable{
 	public void run() {
 		
 			try {
+				
 				InputStream inputStream = socket.getInputStream();
-				//���������ӡ����
 				byte[] buf = new byte[1024];
 				int length = 0;
 				System.out.println("准备干活了");
 				Position position = new Position();
 				while((length = inputStream.read(buf))!=-1)
 				{
-					
+				   
 					String dataTmp = new String(buf,0,length);
 					dataTmp = dataTmp.trim();
 					System.out.println("接收到的数据为："+ new String(buf,0,length));
 					if(!"www.usr.cn".equals(dataTmp))
-					{
-//						float data = Float.parseFloat(dataTmp);
-//						System.out.println(data);
-//						position.setPosition(data);
-//						position.setState(true);
-//						positionDao.savePosition(position);
+					{ 
+                       for(int i = 0;i<length;i++)
+                       {
+                    	   int code = buf[i]&0x00ff;
+                    	   MAVLinkPacket receivedPacket = parser.mavlink_parse_char(code);
+                    	   if(receivedPacket != null)
+                    	   {
+                    		   MAVLinkMessage message = receivedPacket.unpack(); //解码得到信息包
+                               message.unpack(receivedPacket.payload);
+                               System.out.println(message);
+                               //接下来是存入数据库，把数据解析放入数据库
+                               msg_gps_global_origin gps = (msg_gps_global_origin) message;
+                               gpsdao.savePosition(gps);
+                               break;
+                    	   }
+                       }
 						
 					}else{
 						
-						//System.out.println("���յ������Ϊ��"+ new String(buf,0,length));
+						
 						
 					}
-					//OutputStream outputStream = socket.getOutputStream();
-					//outputStream.write("Hello".getBytes());
 				}
 				System.out.println(length);
 				System.out.println("接收完毕，准备关闭socket");
 				socket.close() ;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 			

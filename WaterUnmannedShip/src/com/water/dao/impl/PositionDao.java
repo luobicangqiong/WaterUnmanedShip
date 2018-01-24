@@ -31,14 +31,13 @@ public class PositionDao implements IPositionDao {
 
 	@Override
 	public List<Position> getPosition(Boolean state) {
-		// TODO Auto-generated method stub
+		
 		String sql = "select * from test where state = ?";
 	    try {
 			QueryRunner qr = JdbcUtils.getQuertRunner();
 			return qr.query(sql, new BeanListHandler<Position>(Position.class),state);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+
 			throw new RuntimeException(e);
 		
 		}

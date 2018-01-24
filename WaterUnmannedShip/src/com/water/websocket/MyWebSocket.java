@@ -11,7 +11,10 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
+import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
 import com.water.entity.Position;
 
@@ -59,16 +62,7 @@ public class MyWebSocket {
       sendMessage.setSession(session);
       
       new Thread(sendMessage).start();
-      
-      //群发消息
-//      for(MyWebSocket item: webSocketSet){             
-//          try {
-//              item.sendMessage(message);
-//          } catch (IOException e) {
-//              e.printStackTrace();
-//              continue;
-//          }
-//      }
+
   }
    
   /**
@@ -78,7 +72,7 @@ public class MyWebSocket {
    */
   @OnError
   public void onError(Session session, Throwable error){
-      System.out.println("�������");
+      System.out.println("出现错误");
       error.printStackTrace();
   }
    
@@ -112,6 +106,8 @@ class SendMessage implements Runnable{
 	private Session session;
 	private IPositionDao positionDao = new PositionDao();
 	private List<Position> positionList;
+	IGps_position gpsdao = new Gps_positionDao();
+	
 	StringBuilder sb = new StringBuilder();
 	
 	public void setSession(Session session) {
@@ -136,34 +132,32 @@ class SendMessage implements Runnable{
 	@Override
 	public void run() {
 
+		
+		int preId = 0;
 		blinker = Thread.currentThread();
 		while(blinker != null)
 		{
 			
-			try {
-				positionList = positionDao.getPosition(true);
-				//System.out.println(positionList);
-				if(!positionList.isEmpty())
-				{
-					for(Position position : positionList)
-					{
-						//System.out.println(position);
-						float data = position.getPosition();
-						sb.append(data); 
-						sb.append(" ");
-						positionDao.setPositionState(false, position.getId());
-						
-					}
-					session.getBasicRemote().sendText(sb.toString());
-					//System.out.println(sb.toString());
-					sb.setLength(0);
-				}
+		 try {
+			msg_gps_global_origin gps = gpsdao.getlastPosition();
+			session.getBasicRemote().sendText("123");
+			if(preId != gps.id)
+			{
+				preId = gps.id;
+				sb.delete(0, sb.length());
+				sb.append(gps.latitude + " ");
+				sb.append(gps.longitude + " ");
+				sb.append(gps.altitude);
+				session.getBasicRemote().sendText(sb.toString());
 				
+			}	
 				Thread.sleep(1000*2);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
+
 		}
 	}
 	
