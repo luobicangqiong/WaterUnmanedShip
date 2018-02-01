@@ -21,31 +21,54 @@
   </style>
 </head>
 <body>
-
-	<h1 align="center">水上无人船后台系统</h1>
+     <h1>无人船后台数据</h1>
      <div class="container">
         <div id="one" class="table-responsive">
           <table class="table table-striped table-bordered table-hover" align="center">
           	<tr class="danger">
-          		<th>编号</th>
-          		<th>船速</th>
-          		<th>水速</th>
-          		<th>水质</th>
+          		<th>ID</th>
+          		<th>油门</th>
+          		<th>方向</th>
+          		<th>控制电压</th>
+          		<th>牵引电压</th>
+          		<th>船的温度</th>
+          		<th>水的温度</th>
+          		<th>PH值</th>
+          		<th>经度</th>
+          		<th>维度</th>
           	</tr>
           	
           	<s:iterator var="ship" value="#session.shipdata" status="vs">
 				<tr>
 					<td>
-						<s:property value="#vs.count"/>
+						<s:property value="#ship.id"/>
 					</td>
 					<td>
-						<s:property value="#ship.speedShip"/>
+						<s:property value="#ship.throttle"/>
 					</td>
 					<td>
-						<s:property value="#ship.speedWater"/>
+						<s:property value="#ship.direction"/>
 					</td>
 					<td>
-						<s:property value="#ship.scoreWater"/>
+						<s:property value="#ship.controlvol"/>
+					</td>
+					<td>
+						<s:property value="#ship.tractionvol"/>
+					</td>
+					<td>
+						<s:property value="#ship.shiptemp"/>
+					</td>
+					<td>
+						<s:property value="#ship.watertemp"/>
+					</td>
+					<td>
+						<s:property value="#ship.ph"/>
+					</td>
+					<td>
+						<s:property value="#ship.latitude"/>
+					</td>
+					<td>
+						<s:property value="#ship.longitude"/>
 					</td>
 				</tr>
 			</s:iterator>

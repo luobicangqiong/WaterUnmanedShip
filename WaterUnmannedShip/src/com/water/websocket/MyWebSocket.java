@@ -11,11 +11,16 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import sun.nio.cs.ext.SJIS;
+
+import com.MAVLink.mavlinkpython.common.ShipInformation;
 import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
 import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.ShipInforDao;
 import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
+import com.water.dao.impl.ShipInforImpl;
 import com.water.entity.Position;
 
 @ServerEndpoint("/mywebsocket")
@@ -107,7 +112,7 @@ class SendMessage implements Runnable{
 	private IPositionDao positionDao = new PositionDao();
 	private List<Position> positionList;
 	IGps_position gpsdao = new Gps_positionDao();
-	
+	ShipInforDao shipdao = new ShipInforImpl();
 	StringBuilder sb = new StringBuilder();
 	
 	public void setSession(Session session) {
@@ -134,26 +139,27 @@ class SendMessage implements Runnable{
 
 		
 		int preId = 0;
+		int id = 1;
 		blinker = Thread.currentThread();
 		while(blinker != null)
 		{
 			
 		 try {
-			msg_gps_global_origin gps = gpsdao.getlastPosition();
-			session.getBasicRemote().sendText("123");
-			if(preId != gps.id)
+			 ShipInformation ship = shipdao.getLastInfor();
+			if(preId != ship.id)
 			{
-				preId = gps.id;
+//			    id++;
+//			    id = id%50;
+				preId = ship.id;
 				sb.delete(0, sb.length());
-				sb.append(gps.latitude + " ");
-				sb.append(gps.longitude + " ");
-				sb.append(gps.altitude);
+				sb.append(ship.watertemp + " ");
+				sb.append(ship.shiptemp + " ");
+				sb.append(ship.ph);
 				session.getBasicRemote().sendText(sb.toString());
-				
 			}	
-				Thread.sleep(1000*2);
+				Thread.sleep(1000*1);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}

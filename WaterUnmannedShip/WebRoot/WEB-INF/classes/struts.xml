@@ -12,7 +12,12 @@
 			<result name="success" type="redirectAction">/action/user_list</result>
 			<result name="list">/WEB-INF/list.jsp</result>
 			<result name="input">/add.jsp</result>
-			
+		</action>
+		
+		<action name="list*" class="com.water.action.ListAction" method="list">
+			<result name="success" type="redirectAction">/action/user_list</result>
+			<result name="list">/background/datashow.jsp</result>
+			<result name="input">/add.jsp</result>
 		</action>
 		
 	</package>

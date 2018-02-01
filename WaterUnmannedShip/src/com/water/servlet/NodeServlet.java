@@ -13,12 +13,15 @@ import javax.servlet.http.HttpServlet;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.mavlinkpython.common.ShipInformation;
 import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
 import com.sun.beans.editors.FloatEditor;
 import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.ShipInforDao;
 import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
+import com.water.dao.impl.ShipInforImpl;
 import com.water.entity.Position;
 /**
  * 通信协议接收
@@ -52,7 +55,6 @@ public class NodeServlet extends HttpServlet {
 			
 			e.printStackTrace();
 		}
-		
 	}
 
 }
@@ -86,8 +88,9 @@ class SocketThread extends Thread{
 class MyThread implements Runnable{
 	
 	Parser parser = new Parser();    //解析通信包
-	IPositionDao positionDao = new PositionDao();
+	//IPositionDao positionDao = new PositionDao();
 	IGps_position gpsdao = new Gps_positionDao();
+	ShipInforDao shipdao = new ShipInforImpl();
 	Socket socket;
 	public MyThread(Socket s) {
 		// TODO Auto-generated constructor stub
@@ -122,8 +125,8 @@ class MyThread implements Runnable{
                                message.unpack(receivedPacket.payload);
                                System.out.println(message);
                                //接下来是存入数据库，把数据解析放入数据库
-                               msg_gps_global_origin gps = (msg_gps_global_origin) message;
-                               gpsdao.savePosition(gps);
+                               ShipInformation shipinfor = (ShipInformation) message;
+                               shipdao.saveShipInfor(shipinfor);
                                break;
                     	   }
                        }

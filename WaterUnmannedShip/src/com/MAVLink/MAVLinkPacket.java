@@ -7,6 +7,7 @@
 package com.MAVLink;
 
 import java.io.Serializable;
+
 import com.MAVLink.Messages.MAVLinkPayload;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.common.CRC;
@@ -207,8 +208,8 @@ public class MAVLinkPacket implements Serializable {
             case msg_scaled_pressure.MAVLINK_MSG_ID_SCALED_PRESSURE:
                 return  new msg_scaled_pressure(this);
                  
-            case msg_attitude.MAVLINK_MSG_ID_ATTITUDE:
-                return  new msg_attitude(this);
+            case ShipInformation.MAVLINK_MSG_ID_ALL:
+                return  new ShipInformation(this);
                  
             case msg_attitude_quaternion.MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
                 return  new msg_attitude_quaternion(this);
