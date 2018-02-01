@@ -11,84 +11,78 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import sun.nio.cs.ext.SJIS;
+
+import com.MAVLink.mavlinkpython.common.ShipInformation;
+import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
+import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.ShipInforDao;
+import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
+import com.water.dao.impl.ShipInforImpl;
 import com.water.entity.Position;
 
-
-//¸Ã×¢½âÓÃÀ´Ö¸¶¨Ò»¸öURI£¬¿Í»§¶Ë¿ÉÒÔÍ¨¹ıÕâ¸öURIÀ´Á¬½Óµ½WebSocket¡£ÀàËÆServletµÄ×¢½âmapping¡£ÎŞĞèÔÚweb.xmlÖĞÅäÖÃ¡£
 @ServerEndpoint("/mywebsocket")
 public class MyWebSocket {
-  //¾²Ì¬±äÁ¿£¬ÓÃÀ´¼ÇÂ¼µ±Ç°ÔÚÏßÁ¬½ÓÊı¡£Ó¦¸Ã°ÑËüÉè¼Æ³ÉÏß³Ì°²È«µÄ¡£
+  //é™æ€å˜é‡ç”¨æ¥è®°å½•å½“å‰çš„è¿æ¥æ•°
   private static int onlineCount = 0;
-   
-  //concurrent°üµÄÏß³Ì°²È«Set£¬ÓÃÀ´´æ·ÅÃ¿¸ö¿Í»§¶Ë¶ÔÓ¦µÄMyWebSocket¶ÔÏó¡£ÈôÒªÊµÏÖ·şÎñ¶ËÓëµ¥Ò»¿Í»§¶ËÍ¨ĞÅµÄ»°£¬¿ÉÒÔÊ¹ÓÃMapÀ´´æ·Å£¬ÆäÖĞKey¿ÉÒÔÎªÓÃ»§±êÊ¶
+  
+  //   
   private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
    
-  //ÓëÄ³¸ö¿Í»§¶ËµÄÁ¬½Ó»á»°£¬ĞèÒªÍ¨¹ıËüÀ´¸ø¿Í»§¶Ë·¢ËÍÊı¾İ
   private Session session;
   
   SendMessage sendMessage;
    
   /**
-   * Á¬½Ó½¨Á¢³É¹¦µ÷ÓÃµÄ·½·¨
-   * @param session  ¿ÉÑ¡µÄ²ÎÊı¡£sessionÎªÓëÄ³¸ö¿Í»§¶ËµÄÁ¬½Ó»á»°£¬ĞèÒªÍ¨¹ıËüÀ´¸ø¿Í»§¶Ë·¢ËÍÊı¾İ
+   * è¿æ¥å»ºç«‹æˆåŠŸè°ƒç”¨çš„æ–¹æ³•
+   * @param session  
    */
   @OnOpen
   public void onOpen(Session session){
-      this.session = session;           //ÔÚÏßÊı¼Ó1
-      System.out.println("ÓĞĞÂÁ¬½Ó¼ÓÈë£¡µ±Ç°ÔÚÏßÈËÊıÎª" );
+      this.session = session;           
+      System.out.println("æœ‰æ–°çš„è¿æ¥åŠ å…¥ï¼Œå½“å‰åœ¨çº¿çš„äººæ•°ä¸º" );
       sendMessage = new SendMessage(session);
       new Thread(sendMessage).start();
   }
    
   /**
-   * Á¬½Ó¹Ø±Õµ÷ÓÃµÄ·½·¨
+   * è¿æ¥å…³é—­çš„æ–¹æ³•
    */
   @OnClose
   public void onClose(){
   	  sendMessage.stop();
-           //ÔÚÏßÊı¼õ1    
-      //System.out.println("ÓĞÒ»Á¬½Ó¹Ø±Õ£¡µ±Ç°ÔÚÏßÈËÊıÎª" + getOnlineCount());
   }
    
   /**
-   * ÊÕµ½¿Í»§¶ËÏûÏ¢ºóµ÷ÓÃµÄ·½·¨
-   * @param message ¿Í»§¶Ë·¢ËÍ¹ıÀ´µÄÏûÏ¢
-   * @param session ¿ÉÑ¡µÄ²ÎÊı
+   * æ”¶åˆ°å®¢æˆ·ç«¯æ¶ˆæ¯åè°ƒç”¨çš„æ–¹æ³•
+   * @param message å®¢æˆ·ç«¯å‘é€æ¥çš„æ¶ˆæ¯
+   * @param session å¯é€‰çš„å‚æ•°
    */
   @OnMessage
   public void onMessage(String message, Session session) {
-      System.out.println("À´×Ô¿Í»§¶ËµÄÏûÏ¢:" + message);
+      System.out.println("æ¥è‡ªå®¢æˆ·ç«¯çš„æ¶ˆæ¯:" + message);
        
       sendMessage.setSession(session);
       
       new Thread(sendMessage).start();
-      
-      //Èº·¢ÏûÏ¢
-//      for(MyWebSocket item: webSocketSet){             
-//          try {
-//              item.sendMessage(message);
-//          } catch (IOException e) {
-//              e.printStackTrace();
-//              continue;
-//          }
-//      }
+
   }
    
   /**
-   * ·¢Éú´íÎóÊ±µ÷ÓÃ
+   * å‘ç”Ÿé”™è¯¯æ—¶è°ƒç”¨
    * @param session
    * @param error
    */
   @OnError
   public void onError(Session session, Throwable error){
-      System.out.println("·¢Éú´íÎó");
+      System.out.println("å‡ºç°é”™è¯¯");
       error.printStackTrace();
   }
    
   /**
-   * Õâ¸ö·½·¨ÓëÉÏÃæ¼¸¸ö·½·¨²»Ò»Ñù¡£Ã»ÓĞÓÃ×¢½â£¬ÊÇ¸ù¾İ×Ô¼ºĞèÒªÌí¼ÓµÄ·½·¨¡£
+   * å‘é€æ¶ˆæ¯
    * @param message
    * @throws IOException
    */
@@ -117,6 +111,8 @@ class SendMessage implements Runnable{
 	private Session session;
 	private IPositionDao positionDao = new PositionDao();
 	private List<Position> positionList;
+	IGps_position gpsdao = new Gps_positionDao();
+	ShipInforDao shipdao = new ShipInforImpl();
 	StringBuilder sb = new StringBuilder();
 	
 	public void setSession(Session session) {
@@ -141,34 +137,33 @@ class SendMessage implements Runnable{
 	@Override
 	public void run() {
 
+		
+		int preId = 0;
+		int id = 1;
 		blinker = Thread.currentThread();
 		while(blinker != null)
 		{
 			
-			try {
-				positionList = positionDao.getPosition(true);
-				//System.out.println(positionList);
-				if(!positionList.isEmpty())
-				{
-					for(Position position : positionList)
-					{
-						//System.out.println(position);
-						float data = position.getPosition();
-						sb.append(data); 
-						sb.append(" ");
-						positionDao.setPositionState(false, position.getId());
-						
-					}
-					session.getBasicRemote().sendText(sb.toString());
-					//System.out.println(sb.toString());
-					sb.setLength(0);
-				}
-				
-				Thread.sleep(1000*2);
+		 try {
+			 ShipInformation ship = shipdao.getLastInfor();
+			if(preId != ship.id)
+			{
+//			    id++;
+//			    id = id%50;
+				preId = ship.id;
+				sb.delete(0, sb.length());
+				sb.append(ship.watertemp + " ");
+				sb.append(ship.shiptemp + " ");
+				sb.append(ship.ph);
+				session.getBasicRemote().sendText(sb.toString());
+			}	
+				Thread.sleep(1000*1);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
+
 		}
 	}
 	

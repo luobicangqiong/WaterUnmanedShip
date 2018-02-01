@@ -9,18 +9,18 @@ import com.water.entity.ShipData;
 public interface IShipDataService {
 
 	/**
-	 * ¸ù¾İid²éÑ¯³ö´¬Ö»ÏÖÔÚµÄÖµ
+	 * Öµ æ ¹æ®idæŸ¥è¯¢èˆ¹åªçš„ä¿¡æ¯
 	 * @param id
 	 * @return
 	 */
 	public ShipData getData(int id);
 	/**
-	 * °Ñ´«¸ĞÆ÷·¢¹ıÀ´µÄÊı¾İ±£´æµ½Êı¾İ¿â
+	 * æŠŠä¼ æ„Ÿå™¨å‘è¿‡æ¥çš„æ•°æ®ä¿å­˜åˆ°æ•°æ®åº“
 	 * @param shipData
 	 */
 	public void saveDate(ShipData shipData);
 	/**
-	 * ÏÔÊ¾ËùÓĞµÄ´¬Ö»
+	 * æ˜¾ç¤ºæ‰€æœ‰çš„èˆ¹åª
 	 * @return
 	 */
 	public List<ShipData> getAll();

@@ -14,14 +14,14 @@ public class JdbcUtils {
 		dataSource = new ComboPooledDataSource();
 	}
 	/**
-	 * µÃµ½Êı¾İÔ´¶ÔÏó
+	 * å¾—åˆ°æ•°æ®æºå¯¹è±¡
 	 * @return
 	 */
 	public static DataSource getDataSource() {
 		return dataSource;
 	}
 	/**
-	 * ´´½¨ºËĞÄ¹¤¾ß
+	 * åˆ›å»ºæ ¸å¿ƒå·¥å…·
 	 */
 	public static QueryRunner getQuertRunner()
 	{

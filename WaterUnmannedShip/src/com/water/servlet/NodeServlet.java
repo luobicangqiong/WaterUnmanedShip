@@ -10,11 +10,25 @@ import java.net.Socket;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import com.MAVLink.MAVLinkPacket;
+import com.MAVLink.Parser;
+import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.mavlinkpython.common.ShipInformation;
+import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
 import com.sun.beans.editors.FloatEditor;
+import com.water.dao.IGps_position;
 import com.water.dao.IPositionDao;
+import com.water.dao.ShipInforDao;
+import com.water.dao.impl.Gps_positionDao;
 import com.water.dao.impl.PositionDao;
+import com.water.dao.impl.ShipInforImpl;
 import com.water.entity.Position;
-
+/**
+ * é€šä¿¡åè®®æ¥æ”¶
+ * 1. 
+ * @author luobicangqiong
+ *
+ */
 public class NodeServlet extends HttpServlet {
 
 
@@ -26,24 +40,21 @@ public class NodeServlet extends HttpServlet {
 	
 	public void init() throws ServletException {
 		
-		System.out.println("NodeServlet·şÎñÆô¶¯¿ªÊ¼");
-		System.out.println("×¼±¸¼àÌıµØÃæÕ¾·¢À´µÄĞÅÏ¢");
+		System.out.println("NodeServletæœåŠ¡å¯åŠ¨");
+		System.out.println("å‡†å¤‡ç›‘å¬åœ°é¢ç«™æ¥æ”¶åˆ°çš„ä¿¡æ¯");
 	
 		try {
 			
 			ServerSocket serverSocket = new ServerSocket();
-			//172.19.251.119
+			//172.19.251.119æ³¨æ„æ­¤æ—¶ç›‘å¬çš„IPä¸æ˜¯å…¬ç½‘çš„IPè€Œæ˜¯å†…ç½‘çš„IP
 		   	serverSocket.bind(new InetSocketAddress("172.19.251.119",8086));
-		   	System.out.println("socketÅäÖÃÍê±Ï£¬×¼±¸¼àÌıÁË¡£¡£¡£¡£¡£");
+		   	System.out.println("socketé…ç½®å®Œæ¯•å‡†å¤‡ç›‘å¬");
 			new SocketThread(serverSocket).start();
 			
 		} catch (IOException e) {
 			
 			e.printStackTrace();
 		}
-		
-//		StoreData st = new StoreData();
-//		new Thread(st).start();
 	}
 
 }
@@ -53,7 +64,7 @@ class SocketThread extends Thread{
 	ServerSocket serverSocket;
 	
 	public SocketThread(ServerSocket s) {
-		// TODO Auto-generated constructor stub
+
 		this.serverSocket = s;
 	}
 	@Override
@@ -76,7 +87,10 @@ class SocketThread extends Thread{
 
 class MyThread implements Runnable{
 	
-	IPositionDao positionDao = new PositionDao();
+	Parser parser = new Parser();    //è§£æé€šä¿¡åŒ…
+	//IPositionDao positionDao = new PositionDao();
+	IGps_position gpsdao = new Gps_positionDao();
+	ShipInforDao shipdao = new ShipInforImpl();
 	Socket socket;
 	public MyThread(Socket s) {
 		// TODO Auto-generated constructor stub
@@ -87,39 +101,47 @@ class MyThread implements Runnable{
 	public void run() {
 		
 			try {
+				
 				InputStream inputStream = socket.getInputStream();
-				//°ÑÊä³öÁ÷´òÓ¡³öÀ´
 				byte[] buf = new byte[1024];
 				int length = 0;
-				System.out.println("×¼±¸¸É»îÁË¡£¡£¡£¡£");
+				System.out.println("å‡†å¤‡å¹²æ´»äº†");
 				Position position = new Position();
 				while((length = inputStream.read(buf))!=-1)
 				{
-					
+				   
 					String dataTmp = new String(buf,0,length);
 					dataTmp = dataTmp.trim();
-					System.out.println("½ÓÊÕµ½µÄÊı¾İÎª£º"+ new String(buf,0,length));
+					System.out.println("æ¥æ”¶åˆ°çš„æ•°æ®ä¸ºï¼š"+ new String(buf,0,length));
 					if(!"www.usr.cn".equals(dataTmp))
-					{
-//						float data = Float.parseFloat(dataTmp);
-//						System.out.println(data);
-//						position.setPosition(data);
-//						position.setState(true);
-//						positionDao.savePosition(position);
+					{ 
+                       for(int i = 0;i<length;i++)
+                       {
+                    	   int code = buf[i]&0x00ff;
+                    	   MAVLinkPacket receivedPacket = parser.mavlink_parse_char(code);
+                    	   if(receivedPacket != null)
+                    	   {
+                    		   MAVLinkMessage message = receivedPacket.unpack(); //è§£ç å¾—åˆ°ä¿¡æ¯åŒ…
+                               message.unpack(receivedPacket.payload);
+                               System.out.println(message);
+                               //æ¥ä¸‹æ¥æ˜¯å­˜å…¥æ•°æ®åº“ï¼ŒæŠŠæ•°æ®è§£ææ”¾å…¥æ•°æ®åº“
+                               ShipInformation shipinfor = (ShipInformation) message;
+                               shipdao.saveShipInfor(shipinfor);
+                               break;
+                    	   }
+                       }
 						
 					}else{
 						
-						//System.out.println("½ÓÊÕµ½µÄÊı¾İÎª£º"+ new String(buf,0,length));
+						
 						
 					}
-					//OutputStream outputStream = socket.getOutputStream();
-					//outputStream.write("Hello".getBytes());
 				}
 				System.out.println(length);
-				System.out.println("½ÓÊÜÍê±Ï£¬×¼±¸¹Ø±Õsocket");
+				System.out.println("æ¥æ”¶å®Œæ¯•ï¼Œå‡†å¤‡å…³é—­socket");
 				socket.close() ;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 			
@@ -141,7 +163,6 @@ class StoreData implements Runnable{
 			position.setPosition(random);
 			position.setState(true);
 			positionDao.savePosition(position);
-			//System.out.println("´æÈ¡Êı¾İ³É¹¦");
 			try {
 				Thread.sleep(1000*5);
 			} catch (InterruptedException e) {

@@ -22,14 +22,14 @@ public class UserAction extends ActionSupport{
 		this.shipData = shipData;
 	}
 	
-	/***添加联系人的方法******/
+	/***娣诲姞鏁版嵁******/
 	public String add(){
 		
 		System.out.println(shipData);
 		dataService.saveDate(shipData);
 		return SUCCESS;
 	}
-	/**********显示所有信息*******/
+	/**********鏄剧ず鏁版嵁*******/
 	public String list()
 	{
 		try {

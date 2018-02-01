@@ -51,7 +51,7 @@ public class ShipData implements Serializable{
 	@Override
 	public String toString() {
 
-		return "[´¬ËÙ£º "+speedShip+" ,Ë®ËÙ:"+speedWater+", Ë®ÖÊ£º"+scoreWater+" ]";
+		return "[èˆ¹é€Ÿï¼š "+speedShip+" ,æ°´é€Ÿ:"+speedWater+", æ°´è´¨ï¼š"+scoreWater+" ]";
 	}
 	
 
