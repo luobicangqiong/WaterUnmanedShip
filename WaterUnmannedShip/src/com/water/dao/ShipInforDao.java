@@ -39,5 +39,27 @@ public interface ShipInforDao {
 	 */
 	ShipInformation getLastInfor();
 	
+	/**
+	 * 
+	 */
+	List<ShipInformation> getPre1();
+	/**
+	 * 得到前三天的数据
+	 */
+	List<ShipInformation> getPre3();
+	/**
+	 * 查找前五天的数据
+	 * @return
+	 */
+	List<ShipInformation> getpre5();
+	
+	/**
+	 * 得到前7天的数据
+	 */
+	List<ShipInformation> getpre7();
+	/**
+	 * 得到指定日期之间的数据
+	 */
+	List<ShipInformation> getSpecialData(String begin, String end);
 	
 }

@@ -2,6 +2,8 @@ package com.water.test;
 
 import static org.junit.Assert.*;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -77,5 +79,17 @@ public class ShipInforTest {
 		ShipInformation ship = shipdaoDao.getLastInfor();
 		System.out.println(ship);
 		
+	}
+	
+	@Test
+	public void testGet3() throws Exception {
+		List<ShipInformation> list = shipdaoDao.getPre3();
+		System.out.println(list);
+		
+	}
+	@Test
+	public void testDate() throws Exception {
+		List<ShipInformation> list = shipdaoDao.getSpecialData("2018-03-25 10:00:00", "2018-04-01 10:00:00");
+		System.out.println(list);
 	}
 }

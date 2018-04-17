@@ -47,7 +47,7 @@ public class NodeServlet extends HttpServlet {
 			
 			ServerSocket serverSocket = new ServerSocket();
 			//172.19.251.119注意此时监听的IP不是公网的IP而是内网的IP
-		   	serverSocket.bind(new InetSocketAddress("172.19.251.119",8086));
+		   	serverSocket.bind(new InetSocketAddress("127.0.0.1",8086));
 		   	System.out.println("socket配置完毕准备监听");
 			new SocketThread(serverSocket).start();
 			

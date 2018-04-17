@@ -2,6 +2,7 @@ package com.water.test;
 
 import static org.junit.Assert.*;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.junit.Test;
@@ -28,13 +29,25 @@ public class TestPosition {
 	@Test
 	public void testGet() throws Exception {
 		
-		IPositionDao positionDao = new PositionDao();
-		List<Position> list = positionDao.getPosition(true);
+		PositionDao positionDao = new PositionDao();
+		List<Position> list = positionDao.getDateList("2018-04-01 00:00:00", "2018-04-05 23:59:59");
 		System.out.println(list);
-		for (Position position : list) {
-			System.out.println(position);
-		}
-		//positionDao.setPositionState(false, position.getId());
-		//System.out.println(position);
+//		positionDao.setPositionState(false, position.getId());
+//		System.out.println(position);
+	}
+	
+	@Test
+	public void testSetDate() throws Exception {
+		PositionDao positionDao = new PositionDao();
+		positionDao.setDate("");
+	}
+	
+	@Test
+	public void testGetDate() throws Exception {
+		PositionDao positionDao = new PositionDao();
+		Position position = positionDao.getDate();
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(position.getT_date());
+		System.out.println(timeStamp);
+		
 	}
 }

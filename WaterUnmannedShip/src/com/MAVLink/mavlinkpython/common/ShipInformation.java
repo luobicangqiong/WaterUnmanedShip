@@ -6,6 +6,8 @@
 
 // MESSAGE ATTITUDE PACKING
 package com.MAVLink.mavlinkpython.common;
+import java.sql.Timestamp;
+
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
@@ -40,7 +42,19 @@ public class ShipInformation extends MAVLinkMessage{
     
     public int longitude;
     
-    public int getId() {
+    private Timestamp t_date;
+    
+
+    
+    public Timestamp getT_date() {
+		return t_date;
+	}
+
+	public void setT_date(Timestamp t_date) {
+		this.t_date = t_date;
+	}
+
+	public int getId() {
 		return id;
 	}
 

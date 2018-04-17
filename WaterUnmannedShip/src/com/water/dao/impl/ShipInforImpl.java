@@ -1,7 +1,10 @@
 package com.water.dao.impl;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -11,6 +14,8 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 import com.MAVLink.mavlinkpython.common.ShipInformation;
 import com.sun.org.apache.bcel.internal.generic.Select;
 import com.water.dao.ShipInforDao;
+import com.water.entity.Position;
+import com.water.utils.DateUtilClass;
 import com.water.utils.JdbcUtils;
 
 public class ShipInforImpl implements ShipInforDao{
@@ -105,6 +110,82 @@ public class ShipInforImpl implements ShipInforDao{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public List<ShipInformation> getPre3() {
+		String sql  = "select * from shipinfo where t_date >=? and t_date <=?";
+		QueryRunner qr = JdbcUtils.getQuertRunner();
+		SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return qr.query(sql, new BeanListHandler<ShipInformation>(ShipInformation.class),
+					new Timestamp(DateUtilClass.getDay(new Date(), -3).getTime()),
+					new Timestamp(new Date().getTime()));
+		} catch (Exception e) {
+
+			throw new RuntimeException(e);
+		}
+		
+	}
+
+	@Override
+	public List<ShipInformation> getpre5() {
+		String sql  = "select * from shipinfo where t_date >=? and t_date <=?";
+		QueryRunner qr = JdbcUtils.getQuertRunner();
+		SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return qr.query(sql, new BeanListHandler<ShipInformation>(ShipInformation.class),
+					new Timestamp(DateUtilClass.getDay(new Date(), -5).getTime()),
+					new Timestamp(new Date().getTime()));
+		} catch (Exception e) {
+
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public List<ShipInformation> getpre7() {
+		String sql  = "select * from shipinfo where t_date >=? and t_date <=?";
+		QueryRunner qr = JdbcUtils.getQuertRunner();
+		SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return qr.query(sql, new BeanListHandler<ShipInformation>(ShipInformation.class),
+					new Timestamp(DateUtilClass.getDay(new Date(), -7).getTime()),
+					new Timestamp(new Date().getTime()));
+		} catch (Exception e) {
+
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public List<ShipInformation> getPre1() {
+		String sql  = "select * from shipinfo where t_date >=? and t_date <=?";
+		QueryRunner qr = JdbcUtils.getQuertRunner();
+		SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return qr.query(sql, new BeanListHandler<ShipInformation>(ShipInformation.class),
+					new Timestamp(DateUtilClass.getDay(new Date(), -1).getTime()),
+					new Timestamp(new Date().getTime()));
+		} catch (Exception e) {
+
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public List<ShipInformation> getSpecialData(String begin, String end) {
+		String sql  = "select * from shipinfo where t_date >=? and t_date <=?";
+		QueryRunner qr = JdbcUtils.getQuertRunner();
+		SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return qr.query(sql, new BeanListHandler<ShipInformation>(ShipInformation.class),
+					new Timestamp(fomat.parse(begin).getTime()),
+					new Timestamp(fomat.parse(end).getTime()));
+		} catch (Exception e) {
+
 			throw new RuntimeException(e);
 		}
 	}

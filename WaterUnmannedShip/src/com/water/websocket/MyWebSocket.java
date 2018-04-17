@@ -31,6 +31,7 @@ public class MyWebSocket {
   //   
   private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
    
+  ShipInforDao shipdao = new ShipInforImpl();
   private Session session;
   
   SendMessage sendMessage;
@@ -42,9 +43,8 @@ public class MyWebSocket {
   @OnOpen
   public void onOpen(Session session){
       this.session = session;           
-      System.out.println("有新的连接加入，当前在线的人数为" );
       sendMessage = new SendMessage(session);
-      new Thread(sendMessage).start();
+      //new Thread(sendMessage).start();
   }
    
   /**
@@ -63,10 +63,28 @@ public class MyWebSocket {
   @OnMessage
   public void onMessage(String message, Session session) {
       System.out.println("来自客户端的消息:" + message);
-       
+      List<ShipInformation> list = shipdao.getpre7();
       sendMessage.setSession(session);
+      StringBuilder sb = new StringBuilder();
+      sb.append("pre3:");
+      for(ShipInformation shipInformation : list)
+      {
+    	  sb.append(shipInformation.getPh()+" ");
+    	  sb.append(shipInformation.getShiptemp()+" ");
+    	  sb.append(shipInformation.getWatertemp()+" ");
+    	  sb.append(shipInformation.getLatitude()+" ");
+    	  sb.append(shipInformation.getLongitude()+" ");
+    	  sb.append(shipInformation.getT_date()+", ");
+    	  
+      }
       
-      new Thread(sendMessage).start();
+      try {
+		session.getBasicRemote().sendText(sb.toString());
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+      //new Thread(sendMessage).start();
 
   }
    
@@ -113,7 +131,7 @@ class SendMessage implements Runnable{
 	private List<Position> positionList;
 	IGps_position gpsdao = new Gps_positionDao();
 	ShipInforDao shipdao = new ShipInforImpl();
-	StringBuilder sb = new StringBuilder();
+	
 	
 	public void setSession(Session session) {
 		this.session = session;
@@ -136,8 +154,6 @@ class SendMessage implements Runnable{
 	
 	@Override
 	public void run() {
-
-		
 		int preId = 0;
 		int id = 1;
 		blinker = Thread.currentThread();
@@ -146,16 +162,19 @@ class SendMessage implements Runnable{
 			
 		 try {
 			 ShipInformation ship = shipdao.getLastInfor();
-			if(preId != ship.id)
+			if(preId == ship.id)
 			{
-//			    id++;
-//			    id = id%50;
 				preId = ship.id;
-				sb.delete(0, sb.length());
+				StringBuilder sb = new StringBuilder();
 				sb.append(ship.watertemp + " ");
 				sb.append(ship.shiptemp + " ");
 				sb.append(ship.ph);
-				session.getBasicRemote().sendText(sb.toString());
+				try {
+					session.getBasicRemote().sendText(sb.toString());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}	
 				Thread.sleep(1000*1);
 			} catch (Exception e) {
