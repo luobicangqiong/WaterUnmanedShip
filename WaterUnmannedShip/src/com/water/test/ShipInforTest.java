@@ -9,8 +9,12 @@ import java.util.List;
 import org.junit.Test;
 
 import com.MAVLink.mavlinkpython.common.ShipInformation;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.water.dao.ShipInforDao;
 import com.water.dao.impl.ShipInforImpl;
+import com.water.utils.DateUtilClass;
+import com.water.utils.Server2WebProtocol;
 
 public class ShipInforTest {
 
@@ -26,8 +30,8 @@ public class ShipInforTest {
 		ship.shiptemp = 232;
 		ship.watertemp = 22;
 		ship.ph = 52;
-		ship.latitude = 321;
-		ship.longitude = 7228;
+		ship.latitude = 3018794360l;
+		ship.longitude = 12020246780l;
 		
 	    shipdaoDao.saveShipInfor(ship);
 		
@@ -61,15 +65,25 @@ public class ShipInforTest {
 	@Test
 	public void testGet() throws Exception {
 		ShipInformation ship = shipdaoDao.getShipInfor(2);
-		System.out.println(ship);
-		
+		JSONObject singleJsonObject = Server2WebProtocol.getSingleJsonObject(ship);
+		String dataString = new String(singleJsonObject.toString().getBytes("UTF-8"), "utf-8");
+		System.out.println(dataString);
+		System.out.println(singleJsonObject.toJSONString());
 	}
 	
 	@Test
 	public void testGetAll() throws Exception {
 		
 		List<ShipInformation> list = shipdaoDao.getAll();
-		System.out.println(list);
+		List<JSONObject> jsonList = Server2WebProtocol.getJsonList(list);
+		System.out.println(jsonList);
+		String sb  = "";
+		for(JSONObject jsonObject : jsonList)
+		{
+			sb += jsonObject.toJSONString();
+			
+		}
+		System.out.println(sb);
 		
 	}
 	
@@ -91,5 +105,16 @@ public class ShipInforTest {
 	public void testDate() throws Exception {
 		List<ShipInformation> list = shipdaoDao.getSpecialData("2018-03-25 10:00:00", "2018-04-01 10:00:00");
 		System.out.println(list);
+	}
+	
+	@Test
+	public void testGetSpecial() throws Exception {
+		List<ShipInformation> specialData = shipdaoDao.getSpecialData("2018-3-23", "2018-04-05");
+		
+		System.out.println(specialData);
+	}
+	@Test
+	public void testLong() throws Exception {
+		long l1 = 3018794360l;
 	}
 }

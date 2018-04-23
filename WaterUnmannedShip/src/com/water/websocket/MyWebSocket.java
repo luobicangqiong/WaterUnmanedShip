@@ -11,17 +11,13 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import sun.nio.cs.ext.SJIS;
+
 
 import com.MAVLink.mavlinkpython.common.ShipInformation;
-import com.MAVLink.mavlinkpython.common.msg_gps_global_origin;
-import com.water.dao.IGps_position;
-import com.water.dao.IPositionDao;
+import com.alibaba.fastjson.JSONObject;
 import com.water.dao.ShipInforDao;
-import com.water.dao.impl.Gps_positionDao;
-import com.water.dao.impl.PositionDao;
 import com.water.dao.impl.ShipInforImpl;
-import com.water.entity.Position;
+import com.water.utils.Server2WebProtocol;
 
 @ServerEndpoint("/mywebsocket")
 public class MyWebSocket {
@@ -35,7 +31,6 @@ public class MyWebSocket {
   private Session session;
   
   SendMessage sendMessage;
-   
   /**
    * 连接建立成功调用的方法
    * @param session  
@@ -44,7 +39,7 @@ public class MyWebSocket {
   public void onOpen(Session session){
       this.session = session;           
       sendMessage = new SendMessage(session);
-      //new Thread(sendMessage).start();
+      new Thread(sendMessage).start();
   }
    
   /**
@@ -62,24 +57,21 @@ public class MyWebSocket {
    */
   @OnMessage
   public void onMessage(String message, Session session) {
+	  sendMessage.setReadTime(false);
       System.out.println("来自客户端的消息:" + message);
-      List<ShipInformation> list = shipdao.getpre7();
+      List<ShipInformation> list = shipdao.getSpecialData("2018-03-23 10:00:00", "2018-04-03 10:00:00");
       sendMessage.setSession(session);
-      StringBuilder sb = new StringBuilder();
-      sb.append("pre3:");
-      for(ShipInformation shipInformation : list)
+      List<JSONObject> jsonList = Server2WebProtocol.getJsonList(list);
+      String jString = "";
+      for(JSONObject jsonObject : jsonList)
       {
-    	  sb.append(shipInformation.getPh()+" ");
-    	  sb.append(shipInformation.getShiptemp()+" ");
-    	  sb.append(shipInformation.getWatertemp()+" ");
-    	  sb.append(shipInformation.getLatitude()+" ");
-    	  sb.append(shipInformation.getLongitude()+" ");
-    	  sb.append(shipInformation.getT_date()+", ");
     	  
+    	  jString += jsonObject.toJSONString();
       }
-      
       try {
-		session.getBasicRemote().sendText(sb.toString());
+    	 System.out.println(jString);
+		 session.getBasicRemote().sendText(jString);
+		 sendMessage.setReadTime(true);
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -121,18 +113,32 @@ public class MyWebSocket {
       MyWebSocket.onlineCount--;
   }
 }
-
+/**
+ * 发送消息的线程，现在要考虑的是消息多了以后如何不跟实时发送的消息混淆
+ * @author luobicangqiong
+ *
+ */
 
 class SendMessage implements Runnable{
 
 	private volatile Thread blinker; 
 	private Session session;
-	private IPositionDao positionDao = new PositionDao();
-	private List<Position> positionList;
-	IGps_position gpsdao = new Gps_positionDao();
 	ShipInforDao shipdao = new ShipInforImpl();
+	private boolean readTime = true;
 	
 	
+	public boolean isReadTime() {
+		return readTime;
+	}
+
+
+
+	public void setReadTime(boolean readTime) {
+		this.readTime = readTime;
+	}
+
+
+
 	public void setSession(Session session) {
 		this.session = session;
 	}
@@ -154,28 +160,39 @@ class SendMessage implements Runnable{
 	
 	@Override
 	public void run() {
+		
 		int preId = 0;
-		int id = 1;
 		blinker = Thread.currentThread();
+		String sendData = "";
 		while(blinker != null)
 		{
 			
 		 try {
-			 ShipInformation ship = shipdao.getLastInfor();
-			if(preId == ship.id)
+			ShipInformation ship = shipdao.getLastInfor();
+			if(preId != ship.id)
 			{
 				preId = ship.id;
-				StringBuilder sb = new StringBuilder();
-				sb.append(ship.watertemp + " ");
-				sb.append(ship.shiptemp + " ");
-				sb.append(ship.ph);
-				try {
-					session.getBasicRemote().sendText(sb.toString());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}	
+				JSONObject json = Server2WebProtocol.getSingleJsonObject(ship);
+				if(!this.readTime){
+					
+					sendData += json.toJSONString();
+					
+				}else{
+					try {
+						if(sendData != ""){
+							
+							session.getBasicRemote().sendText(sendData);
+							sendData = "";
+							
+						}else{
+							
+							session.getBasicRemote().sendText(json.toJSONString());
+						}
+					} catch (Exception e) {
+						e.printStackTrace(); 
+					}
+			    }
+			}
 				Thread.sleep(1000*1);
 			} catch (Exception e) {
 

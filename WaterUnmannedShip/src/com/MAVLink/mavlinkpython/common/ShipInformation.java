@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Messages.MAVLinkMessage;
 import com.MAVLink.Messages.MAVLinkPayload;
+import com.water.utils.DateUtilClass;
         
 /**
 * The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right).
@@ -38,9 +39,9 @@ public class ShipInformation extends MAVLinkMessage{
     
     public int ph;
     
-    public int latitude;
+    public long latitude;
     
-    public int longitude;
+    public long longitude;
     
     private Timestamp t_date;
     
@@ -118,19 +119,19 @@ public class ShipInformation extends MAVLinkMessage{
 		this.ph = ph;
 	}
 
-	public int getLatitude() {
+	public long getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(int latitude) {
+	public void setLatitude(long latitude) {
 		this.latitude = latitude;
 	}
 
-	public int getLongitude() {
+	public long getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(int longitude) {
+	public void setLongitude(long longitude) {
 		this.longitude = longitude;
 	}
 
@@ -169,9 +170,9 @@ public class ShipInformation extends MAVLinkMessage{
         
         packet.payload.putInt(ph);
         
-        packet.payload.putInt(latitude);
+        packet.payload.putLong(latitude);
         
-        packet.payload.putInt(longitude);
+        packet.payload.putLong(longitude);
         
         
         return packet;
@@ -201,9 +202,9 @@ public class ShipInformation extends MAVLinkMessage{
         
         this.ph = payload.getInt();
         
-        this.latitude = payload.getInt();
+        this.latitude = payload.getLong();
         
-        this.longitude = payload.getInt();
+        this.longitude = payload.getLong();
         
     }
 
